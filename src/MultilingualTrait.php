@@ -25,15 +25,24 @@ trait MultilingualTrait
      *
      * @return $this
      */
-    public function localized($language = null, $abridge = true)
+    public function localized($language = null, $abridge = true, $joinWith = false)
     {
         $language = $language ?: Yii::$app->language;
 
-        if (!isset($this->with['translations'])) {
-            $this->with(['translation' => function ($query) use ($language, $abridge) {
-                /** @var ActiveQuery $query */
-                $query->where([$this->languageField => $abridge ? substr($language, 0, 2) : $language]);
-            }]);
+        if ($joinWith) {
+            if (!isset($this->joinWith['translations'])) {
+                $this->joinWith(['translation' => function ($query) use ($language, $abridge) {
+                    /** @var ActiveQuery $query */
+                    $query->where([$this->languageField => $abridge ? substr($language, 0, 2) : $language]);
+                }]);
+            }
+        } else {
+            if (!isset($this->with['translations'])) {
+                $this->with(['translation' => function ($query) use ($language, $abridge) {
+                    /** @var ActiveQuery $query */
+                    $query->where([$this->languageField => $abridge ? substr($language, 0, 2) : $language]);
+                }]);
+            }
         }
 
         return $this;
